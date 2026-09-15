@@ -13,8 +13,11 @@ npx prisma migrate dev --name init
 
 
 ------------------------git--------------------
-
-
+git init
+git remote add origin https://github.com/Huneshwar97/Airbnb.git
+haman-yadav@LAPTOP-HNT6IKPV ~/project/Airbnb (master)$ git remote -v
+origin  https://github.com/Huneshwar97/Airbnb.git (fetch)
+origin  https://github.com/Huneshwar97/Airbnb.git (push)
 
 
 ----------DB issue----------------
