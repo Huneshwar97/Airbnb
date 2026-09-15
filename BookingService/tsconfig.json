@@ -1,0 +1,112 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    // ── File Layout ──────────────────────────────────────────────
+    "rootDir": "./src",
+    // All .ts source lives under src/. Keeping generated output (dist/)
+    // physically separate from source is what makes .gitignore-ing one
+    // directory and deploying the other clean and unambiguous.
+    "outDir": "./dist",
+
+    // ── Environment Settings ─────────────────────────────────────
+    // `npx tsc --init`'s modern default is "module": "nodenext" (native
+    // ESM). We deliberately stay on CommonJS instead:
+    //  - Every relative import in this codebase is written extensionless
+    //    (`from '../config'`), which real Node ESM rejects outright —
+    //    it requires explicit '.js' extensions on every relative import.
+    //  - No dependency here (express, prisma, ioredis, bullmq, redlock,
+    //    winston, zod) requires ESM; all work natively under CJS.
+    //  - This is an unbundled Express server, not a library or a
+    //    frontend app — ESM's actual selling points (tree-shaking,
+    //    static analysis for bundlers) don't apply to a process that's
+    //    never bundled.
+    // See the project README for the full CJS-vs-ESM write-up.
+    "module": "commonjs",
+    "target": "es2016",
+
+    // Lets `import express from 'express'` work against packages that
+    // only ship `module.exports = ...` (no default export), which is
+    // how most CommonJS-era packages here (express, winston, etc.) are
+    // written. Without this, those imports need `import * as express`.
+    "esModuleInterop": true,
+
+    // Catches import-path casing typos (`./Config` vs `./config`) that
+    // work on case-insensitive filesystems (Windows/macOS default) but
+    // break in CI/production on case-sensitive Linux filesystems.
+    "forceConsistentCasingInFileNames": true,
+
+    // NOTE: no "types" array is set here, which means TypeScript
+    // auto-includes every @types/* package found in node_modules
+    // (@types/node, @types/express) — exactly what's needed for
+    // process.env, Buffer, Express's Request/Response augmentations,
+    // etc. Setting "types": [] (the tsc --init default) would silently
+    // turn all of that off and break the whole project.
+
+    // ── Other Outputs ────────────────────────────────────────────
+    // Source maps let winston/error logs show real .ts line numbers
+    // instead of compiled .js line numbers — worth the small build-time
+    // cost for a server whose logs you'll actually be reading.
+    "sourceMap": true,
+    // declaration/declarationMap generate .d.ts files for consumers of
+    // this package. This is an application (nothing imports
+    // BookingService as a library), so they're left off to keep dist/
+    // smaller and builds slightly faster. Turn them back on if this
+    // service's types ever need to be published/shared.
+
+    // ── Stricter Typechecking Options ────────────────────────────
+    // Both verified clean against the real codebase — zero new errors.
+    // Array/object index access (`arr[i]`) includes `| undefined` in its
+    // type, forcing you to actually handle the empty/missing case
+    // instead of assuming it's always there.
+    "noUncheckedIndexedAccess": true,
+    // Distinguishes an omitted optional property from one explicitly
+    // set to `undefined` — catches a real class of bugs in DTOs/partial
+    // updates.
+    "exactOptionalPropertyTypes": true,
+
+    // ── Style Options ────────────────────────────────────────────
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    // Verified against the real codebase: Express's error-handling
+    // middleware must declare all 4 params (err, req, res, next) even
+    // when some are unused — Express distinguishes error middleware
+    // from regular middleware by counting the function's declared
+    // arity. Those intentionally-unused params are prefixed with `_`
+    // (e.g. `_req`, `_next`), which this option's own convention exempts
+    // from the "unused" check.
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // NOT enabled: "noPropertyAccessFromIndexSignature". Tested it
+    // against this codebase — it breaks every `process.env.PORT`-style
+    // access (NodeJS.ProcessEnv is typed with an index signature),
+    // forcing `process.env['PORT']` bracket notation everywhere env
+    // vars are read. Too much churn for this project's benefit.
+
+    // ── Recommended Options ──────────────────────────────────────
+    "strict": true,
+    // NOT enabled: "jsx". This is a backend Express API with no
+    // React/JSX anywhere — the option is dead weight here.
+    // NOT enabled: "verbatimModuleSyntax". Tested it against this
+    // codebase — it requires `import type` for every type-only import
+    // and rejects the plain `export const foo = ...` / `import { X }`
+    // style used throughout under `module: commonjs`, producing 100+
+    // errors across every file. Real, but not worth the rewrite for
+    // this project; it's aimed at codebases already on native ESM.
+    "isolatedModules": true,
+    // Also what makes `tsx` (esbuild-based, our dev runner) safe to use:
+    // esbuild transpiles one file at a time and can't see across files,
+    // so this option keeps the code honest about that same constraint
+    // at typecheck time too.
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
