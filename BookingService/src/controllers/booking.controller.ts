@@ -2,6 +2,7 @@ import type {Request,Response}from "express"
 import {createBookingService,confirmBookingService} from "../services/booking.service"
 import {BadRequestError} from "../utils/errors/app.error"
 
+
 /**
  * POST /api/v1/bookings
  *

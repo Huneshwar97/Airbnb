@@ -1,5 +1,7 @@
-import { Prisma } from "../prisma/generated/client";
+import { Prisma , IdempotencyKey } from "../prisma/generated/client";
 import prismaClient from "../prisma/client";   // relative path to the file above
+import { validate as isValidUUID } from "uuid";
+import { BadRequestError,NotFoundError }from "../utils/errors/app.error"
 
 
 /**
@@ -32,13 +34,26 @@ export async function createIdempotencyKey(key: string,bookingId :number){
     return idempotencyKey;
 }
 
-export async function getIdempotencyKey(key:string){
-    const idempotencyKey = await prismaClient.idempotencyKey.findUnique({
-        where : {
-            idemKey : key
-        }
-    })
-    return idempotencyKey;
+export async function getIdempotencyKeyWithLock(tx: Prisma.TransactionClient,key:string,){
+
+    if(!isValidUUID(key)) {
+        throw new BadRequestError("Invalid idempotency key format");
+    }
+
+    // Use Prisma's tagged-template `$queryRaw` (parameterized query) instead of
+    // `Prisma.raw()` string interpolation. `Prisma.raw` inlines the value directly
+    // into the SQL string with no escaping, which is a SQL-injection vector even
+    // when the value has been validated elsewhere. `$queryRaw` sends `key` as a
+    // bound parameter, so it is always safely escaped by the underlying driver.
+    // `FOR UPDATE` takes a row-level lock for the lifetime of the transaction,
+    // which is what makes this call safe to use for idempotent booking confirmation.
+    const idempotencyKey: Array<IdempotencyKey> = await tx.$queryRaw`SELECT * FROM IdempotencyKey WHERE idemKey = ${key} FOR UPDATE;`;
+
+    if(!idempotencyKey || idempotencyKey.length === 0) {
+        throw new NotFoundError("Idempotency key not found");
+    }
+
+    return idempotencyKey[0];
 }
 
 /** Fetches a single booking by its primary key, or `null` if it doesn't exist. */
@@ -52,8 +67,8 @@ export async function getBookingById(bookingId:number){
 }
 
 /** Marks a booking CONFIRMED. Expected to run inside the same transaction as `getIdempotencyKeyWithLock`. */
-export async function confirmBooking( bookingId: number) {
-    const booking = await prismaClient.booking.update({
+export async function confirmBookingWithLock( tx: Prisma.TransactionClient,bookingId: number) {
+    const booking = await tx.booking.update({
         where: {
             id: bookingId
         },
@@ -84,8 +99,8 @@ export async function cancelBooking(bookingId: number) {
 
 
 /** Marks an idempotency key as finalized so it cannot be used to confirm a booking again. */
-export async function finalizeIdempotencyKey( key: string) {
-    const idempotencyKey = await prismaClient.idempotencyKey.update({
+export async function finalizeIdempotencyKeyWithLock(tx:Prisma.TransactionClient, key: string) {
+    const idempotencyKey = await tx.idempotencyKey.update({
         where: {
             idemKey: key
         },

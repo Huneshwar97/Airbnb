@@ -7,3 +7,7 @@
 {"level":"info","message":"Validating request body","timestamp":"09-16-2026 13:18:21","correlationId":"ae5673f4-46e0-4e0a-999a-10a99ec930ba","data":{}}
 {"level":"info","message":"Request body is valid","timestamp":"09-16-2026 13:18:21","correlationId":"ae5673f4-46e0-4e0a-999a-10a99ec930ba","data":{}}
 {"level":"warn","message":"Handled application error: Idempotency key already finalized","timestamp":"09-16-2026 13:20:38","correlationId":"789e4c10-806b-4866-8178-d61610ba0db9","data":{"statusCode":400,"name":"BadRequestError"}}
+{"level":"info","message":"Server is running on http://localhost:3001","timestamp":"09-16-2026 18:33:52","correlationId":"unknown-error-while-creating-correlation-id","data":{}}
+{"level":"info","message":"Press Ctrl+C to stop the server.","timestamp":"09-16-2026 18:33:52","correlationId":"unknown-error-while-creating-correlation-id","data":{}}
+{"level":"info","message":"Validating request body","timestamp":"09-16-2026 18:36:53","correlationId":"b3c503a1-1a9b-4412-9c83-ebcbdb6506a6","data":{}}
+{"level":"info","message":"Request body is valid","timestamp":"09-16-2026 18:36:53","correlationId":"b3c503a1-1a9b-4412-9c83-ebcbdb6506a6","data":{}}
