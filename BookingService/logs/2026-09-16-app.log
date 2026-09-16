@@ -1,0 +1,9 @@
+{"level":"info","message":"Server is running on http://localhost:3001","timestamp":"09-16-2026 13:10:26","correlationId":"unknown-error-while-creating-correlation-id","data":{}}
+{"level":"info","message":"Press Ctrl+C to stop the server.","timestamp":"09-16-2026 13:10:26","correlationId":"unknown-error-while-creating-correlation-id","data":{}}
+{"level":"info","message":"Validating request body","timestamp":"09-16-2026 13:17:53","correlationId":"78b89b3b-bb40-467b-9a3f-705cfe788cd9","data":{}}
+{"level":"error","message":"Request body is invalid","timestamp":"09-16-2026 13:17:53","correlationId":"78b89b3b-bb40-467b-9a3f-705cfe788cd9","data":{"errors":[{"path":"userId","message":"User ID must be present"},{"path":"bookingAmount","message":"Booking amount must be present"}]}}
+{"level":"info","message":"Validating request body","timestamp":"09-16-2026 13:18:08","correlationId":"0517099a-c8cb-4924-93a1-73ead2ad6893","data":{}}
+{"level":"error","message":"Request body is invalid","timestamp":"09-16-2026 13:18:08","correlationId":"0517099a-c8cb-4924-93a1-73ead2ad6893","data":{"errors":[{"path":"userId","message":"User ID must be present"}]}}
+{"level":"info","message":"Validating request body","timestamp":"09-16-2026 13:18:21","correlationId":"ae5673f4-46e0-4e0a-999a-10a99ec930ba","data":{}}
+{"level":"info","message":"Request body is valid","timestamp":"09-16-2026 13:18:21","correlationId":"ae5673f4-46e0-4e0a-999a-10a99ec930ba","data":{}}
+{"level":"warn","message":"Handled application error: Idempotency key already finalized","timestamp":"09-16-2026 13:20:38","correlationId":"789e4c10-806b-4866-8178-d61610ba0db9","data":{"statusCode":400,"name":"BadRequestError"}}

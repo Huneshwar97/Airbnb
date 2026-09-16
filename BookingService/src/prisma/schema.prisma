@@ -6,12 +6,12 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../prisma/generated"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+    url      = env("DATABASE_URL")
 }
 
 model Booking {
@@ -23,7 +23,18 @@ model Booking {
   bookingAmount     Int
   status            BookingStatus @default(PENDING)
   totalGuests       Int
-  
+  idempotencyKey    IdempotencyKey?  
+}
+
+model IdempotencyKey {
+  id         Int      @id @default(autoincrement())
+  idemKey    String   @unique // uuid 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  finalized  Boolean  @default(false)
+  bookingId  Int      @unique
+  booking    Booking? @relation(fields: [bookingId], references: [id])
+
 }
 
 enum BookingStatus {
